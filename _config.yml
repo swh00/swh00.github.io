@@ -16,7 +16,7 @@ timezone: Asia/Seoul
 
 title: swh Log # the main title
 
-tagline:  마구자비로 기록하는 공간:  ㅈ# it will display as the subt
+tagline:  아무거나 기록하는 공간 # it will display as the subt
 
 description: >- # used by seo meta and the atom feed
   개발과 투자를 주로 기록하며, 아무거나 작성하는 블로그입니다.
