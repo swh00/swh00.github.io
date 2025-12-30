@@ -72,7 +72,11 @@ tags: [태그1, 태그2]
 ```
 그렇게 완성된 블로그는 다음과 같이 보입니다.
 
+![화이트 모드](/assets/img/2025post/2025-12-30-chirpy-white.jpg)
+_화이트 모드_
 
+![다크 모드](/assets/img/2025post/2025-12-30-chirpy-dark.jpg)
+_다크 모드_
 
 ## 4. 댓글 시스템 적용 (Giscus)
 
