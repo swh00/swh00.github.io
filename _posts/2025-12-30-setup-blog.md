@@ -2,7 +2,7 @@
 layout: post
 title: "GitHub Pages 블로그 구축 기록 (Theme: Chirpy)"
 date: 2025-12-30 18:00:00 +0900
-categories: [Development, Blog]
+categories: [개발, 블로그]
 tags: [github-pages, jekyll, chirpy, giscus]
 ---
 
