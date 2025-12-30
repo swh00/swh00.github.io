@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "모듈 없이 올림(Ceiling) 구현하기 (정수 연산 팁)"
+title: "모듈 없이 올림(Ceiling) 구현하기"
 date: 2025-12-30 19:30:00 +0900
-categories: [Algorithm]
+categories: [개발, 간단한 팁]
 tags: [math, trick, optimization]
 ---
 
