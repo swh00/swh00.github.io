@@ -62,10 +62,10 @@ AI를 사용하면서 항상 느끼는 점은, 사용자에 따라 AI 성능도 
 
 참고로 코딩이나 형식 등이 마음에 들지 않는다 싶으면 수정하셔도 되고, 오류가 발생하면 댓글 부탁드리겠습니다.
 
-[전체 링크](https://github.com/swh00/BOJ-solutions)
+[Github 링크](https://github.com/swh00/BOJ-solutions)
 
 <details>
-<summary><b>📜 boj-auto-filler.yml (클릭)</b></summary>
+<summary><b>📜 .github/workflows/boj-auto-filler.yml (클릭)</b></summary>
 
 ```yaml
 name: Auto Create Issue & Link to Folder
@@ -129,7 +129,7 @@ jobs:
 </details>
 
 <details>
-<summary><b>📜 issue_linker.py (클릭)</b></summary
+<summary><b>📜 scripts/issue_linker.py (클릭)</b></summary
 
 ```issue_linker.py
 # scripts/issue_linker.py
