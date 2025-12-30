@@ -58,7 +58,8 @@ AI를 사용하면서 항상 느끼는 점은, 사용자에 따라 AI 성능도 
 > **링크:** [문제 풀러 가기] / [내 정답 코드 보기(Github)]
 
 
-**실제 화면**{: .text-center }
+**실제 화면**
+{: .text-center }
 | 백준 확장프로그램 | 자동 생성된 이슈 |
 | :-: | :-: |
 | ![백준 확장프로그램](/assets/img/2025post/2025-12-30-setup-boj-extension/2025-12-30-boj-extension.jpg) | ![자동 생성된 Issue](/assets/img/2025post/2025-12-30-setup-boj-extension/2025-12-30-boj-issue-note.jpg) |
