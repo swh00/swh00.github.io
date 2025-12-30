@@ -2,7 +2,7 @@
 layout: post
 title: "[Github] 백준과 깃허브 연동"
 date: 2025-12-30 21:00:00 +0900
-categories: [Development, Automation]
+categories: [개발, 자동화]
 tags: [github-actions, python, baekjoon, solved.ac]
 ---
 
