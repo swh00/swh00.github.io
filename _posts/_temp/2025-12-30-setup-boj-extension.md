@@ -4,6 +4,7 @@ title: "[Github] 백준과 깃허브 연동"
 date: 2025-12-30 21:00:00 +0900
 categories: [개발, 자동화]
 tags: [github-actions, python, baekjoon, solved.ac]
+published: false
 ---
 
 알고리즘 공부를 하면서 가장 번거로운 것은 **"문제 풀이 코드 저장"**과 **"풀이 방법 정리"**였습니다.
@@ -56,6 +57,12 @@ AI를 사용하면서 항상 느끼는 점은, 사용자에 따라 AI 성능도 
 > | **태그** | `수학`, `사칙연산` |
 >
 > **링크:** [문제 풀러 가기] / [내 정답 코드 보기(Github)]
+
+**실제 화면**
+| 이미지 1 설명 | 이미지 2 설명 |
+| :-: | :-: |
+| ![백준 확장프로그램](assets/img/2025post/2025-12-30-setup-boj-extension/2025-12-30-boj-extension.jpg) | ![자동 생성된 Issue](assets/img/2025post/2025-12-30-setup-boj-extension/2025-12-30-boj-issue-note) |
+
 
 ### 📂 적용한 GitHub Actions 코드
 혹시 필요한 분들을 위해 최종 완성된 `.github/workflows/auto-issue-link.yml` 코드와, 해당 코드에 필요한 파이썬 스크립트 `scripts/issue_linker.py`를 공유합니다. 각각 백준 확장프로그램이 자동으로 생성한 리포지리에서 폴더를 만들고, 알맞은 폴더에 코드를 넣으신 다음, 문제를 풀면 됩니다. 
