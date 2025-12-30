@@ -72,10 +72,10 @@ tags: [태그1, 태그2]
 ```
 그렇게 완성된 블로그는 다음과 같이 보입니다.
 
-![화이트 모드](/assets/img/2025post/2025-12-30-chirpy-white.jpg)
+![화이트 모드](/assets/img/2025post/2025-12-30-setup-blog/2025-12-30-chirpy-white.jpg)
 _화이트 모드_
 
-![다크 모드](/assets/img/2025post/2025-12-30-chirpy-dark.jpg)
+![다크 모드](/assets/img/2025post/2025-12-30-setup-blog/2025-12-30-chirpy-dark.jpg)
 _다크 모드_
 
 ## 4. 댓글 시스템 적용 (Giscus)
@@ -93,15 +93,15 @@ comments:
   provider: giscus
   giscus:
     repo: swh00/swh00.github.io
-    repo_id: "발급받은 ID"
+    repo_id: "발급받은 repo ID" #
     category: General
-    category_id: "발급받은 ID"
+    category_id: "발급받은 category ID"
     mapping: pathname
     input_position: bottom
     lang: ko
 ```
 
-## 5. 포스트 작성 가이드
+## 5. 글 작성 가이드
 
 Chirpy 테마에서 글을 작성하는 표준 절차는 다음과 같습니다.
 
@@ -118,7 +118,7 @@ Chirpy 테마에서 글을 작성하는 표준 절차는 다음과 같습니다.
 ---
 layout: post
 title: "포스트 제목"
-date: 2024-01-01 12:00:00 +0900
+date: 2025-01-01 12:00:00 +0900
 categories: [대분류, 중분류]
 tags: [태그1, 태그2]
 ---
@@ -133,13 +133,13 @@ GitHub Pages는 정적 호스팅이므로 이미지를 저장소에 직접 업�
 ### 1. 이미지 업로드
 블로그 루트 디렉토리의 `assets/img/` 폴더에 이미지를 업로드합니다. (관리를 위해 연도별 폴더 등을 만들어 관리하는 것을 권장합니다.)
 
-* 경로 예시: `assets/img/2024/chart_01.png`
+* 경로 예시: `assets/img/2025/chart_01.png`
 
 ### 2. 마크다운에 이미지 삽입
 글 작성 시 절대 경로(`/`)를 사용하여 이미지를 불러옵니다.
 
 ```markdown
-![이미지 설명](/assets/img/2024/chart_01.png)
+![이미지 설명](/assets/img/2025/chart_01.png)
 ```
 
 **Tip:** 캡션을 달거나 사이즈를 조절하고 싶다면 HTML 태그를 직접 사용하거나 테마에서 제공하는 확장 문법을 사용할 수 있습니다.
