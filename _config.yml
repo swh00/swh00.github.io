@@ -120,9 +120,9 @@ comments:
   # Giscus options › https://giscus.app
   giscus:
     repo: swh00/swh00.github.io # <gh-username>/<repo>
-    repo_id:
+    repo_id: R_kgDOQxBHhw
     category: General
-    category_id:
+    category_id: DIC_kwDOQxBHh84C0YvU
     mapping: pathname # optional, default to 'pathname'
     strict: 0 # optional, default to '0'
     input_position: bottom # optional, default to 'bottom'
