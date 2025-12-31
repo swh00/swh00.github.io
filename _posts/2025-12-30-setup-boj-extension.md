@@ -138,7 +138,7 @@ jobs:
 </details>
 
 <details>
-<summary><b>📜 scripts/issue_linker.py (클릭)</b></summary
+<summary><b>📜 scripts/issue_linker.py (클릭)</b></summary>
 
 ```issue_linker.py
 # scripts/issue_linker.py
