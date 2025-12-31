@@ -72,8 +72,7 @@ AI를 사용하면서 항상 느끼는 점은, 사용자에 따라 AI 성능도 
 참고로 코드나 형식 등이 마음에 들지 않는다 싶으면 수정하셔도 되고, 오류가 발생하면 댓글 부탁드리겠습니다.
 
 [Github 링크](https://github.com/swh00/boj-auto-template)
-
-<details>
+<details markdown="1">
 <summary><b>📜 .github/workflows/boj-auto-filler.yml (클릭)</b></summary>
 
 ```yaml
@@ -135,10 +134,15 @@ jobs:
           TARGET_ID: ${{ inputs.problem_id }}
         run: python scripts/issue_linker.py
 ```
+
 </details>
 
-<details> <summary><b>📜 scripts/issue_linker.py (클릭)</b></summary>
-```Python
+<br>
+
+<details markdown="1">
+<summary><b>📜 scripts/issue_linker.py (클릭)</b></summary>
+
+```python
 # scripts/issue_linker.py
 import os
 import requests
@@ -373,4 +377,5 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
 </details>
