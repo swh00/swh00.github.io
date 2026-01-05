@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "파이썬 정규표현식(RegEx) 정리"
-date: 2026-01-06
+date: 2026-01-05
 categories: [개발, 파이썬]
 tags: [python, regex, study]
 ---
