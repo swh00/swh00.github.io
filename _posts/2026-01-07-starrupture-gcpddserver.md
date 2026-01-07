@@ -126,8 +126,8 @@ chmod +x steamcmd.sh linux32/steamcmd linux32/steamerrorreporter
 
 ./steamcmd.sh \
   +@sSteamCmdForcePlatformType windows \
-  +login anonymous \
   +force_install_dir /home/steam/starrupture-server \
+  +login anonymous \
   +app_update 3809400 validate \
   +quit
 
