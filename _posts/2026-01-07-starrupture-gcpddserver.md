@@ -69,15 +69,15 @@ Authorize를 누르면 아래와 같이 서버 컴퓨터에 접속됩니다.
 
 ```bash
 sudo apt update && sudo apt upgrade -y
+
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
-sudo usermod -aG docker $USER
+
+# docker compose 플러그인
+sudo apt install -y docker-compose-plugin
 
 sudo rm -rf ~/starrupture-server
-mkdir -p ~/starrupture-server/data/server
-mkdir -p ~/starrupture-server/data/steamcmd
-sudo chown -R 1000:1000 ~/starrupture-server
-sudo chmod -R 777 ~/starrupture-server
+mkdir -p ~/starrupture-server
 cd ~/starrupture-server
 ```
 
@@ -86,6 +86,8 @@ cat << 'EOF' > Dockerfile
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV STEAMCMD_DIR=/opt/steamcmd
+ENV SERVER_DIR=/opt/starrupture
 
 RUN dpkg --add-architecture i386 && apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -95,9 +97,19 @@ RUN dpkg --add-architecture i386 && apt-get update && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m steam
+USER steam
 WORKDIR /home/steam
 
-USER steam
+RUN mkdir -p ${STEAMCMD_DIR} && \
+    cd ${STEAMCMD_DIR} && \
+    curl -sqL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar zx && \
+    chmod +x steamcmd.sh linux32/steamcmd linux32/steamerrorreporter
+
+RUN ${STEAMCMD_DIR}/steamcmd.sh \
+    +@sSteamCmdForcePlatformType windows \
+    +force_install_dir ${SERVER_DIR} \
+    +login anonymous \
+    +quit
 RUN xvfb-run winetricks -q vcrun2015
 
 USER root
@@ -105,6 +117,7 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh && chown steam:steam /entrypoint.sh
 
 USER steam
+WORKDIR ${SERVER_DIR}
 ENTRYPOINT ["/entrypoint.sh"]
 EOF
 
@@ -112,36 +125,38 @@ cat << 'EOF' > entrypoint.sh
 #!/bin/bash
 set -e
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/steam/steamcmd
+export HOME=/home/steam
+export STEAMCMD_DIR=/opt/steamcmd
+export SERVER_DIR=/opt/starrupture
+export DISPLAY=:99
 
-# --- SteamCMD only (no X / no Wine) ---
-if [ ! -f "/home/steam/steamcmd/steamcmd.sh" ]; then
-    mkdir -p /home/steam/steamcmd
-    cd /home/steam/steamcmd
-    curl -sqL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar zx
+# --- install once ---
+if [ ! -d "$SERVER_DIR/StarRupture" ]; then
+    echo "[INIT] Installing StarRupture server..."
+    ${STEAMCMD_DIR}/steamcmd.sh \
+      +@sSteamCmdForcePlatformType windows \
+      +force_install_dir ${SERVER_DIR} \
+      +login anonymous \
+      +app_update 3809400 \
+      +quit
 fi
 
-cd /home/steam/steamcmd
-chmod +x steamcmd.sh linux32/steamcmd linux32/steamerrorreporter
-
-./steamcmd.sh \
-  +@sSteamCmdForcePlatformType windows \
-  +force_install_dir /home/steam/starrupture-server \
-  +login anonymous \
-  +app_update 3809400 validate \
-  +quit
-
-# --- Xvfb after SteamCMD ---
+# --- Xvfb ---
 rm -f /tmp/.X99-lock
 Xvfb :99 -screen 0 1024x768x16 &
-export DISPLAY=:99
 sleep 3
 
-# --- Run server ---
-cd /home/steam/starrupture-server/StarRupture/Binaries/Win64
+cd ${SERVER_DIR}/StarRupture/Binaries/Win64
+
 exec wine StarRuptureServerEOS-Win64-Shipping.exe \
-  -Log -port=7777 -multihome=0.0.0.0 -unattended -NoNativeSnd
+  -Log \
+  -port=7777 \
+  -multihome=0.0.0.0 \
+  -unattended \
+  -NoNativeSnd
 EOF
+
+chmod +x entrypoint.sh
 
 cat << 'EOF' > docker-compose.yml
 services:
@@ -152,9 +167,6 @@ services:
     ports:
       - "7777:7777/udp"
       - "7777:7777/tcp"
-    volumes:
-      - ./data/server:/home/steam/starrupture-server
-      - ./data/steamcmd:/home/steam/steamcmd
     environment:
       - WINEDEBUG=-all
     logging:
@@ -163,8 +175,6 @@ services:
         max-size: "10m"
         max-file: "3"
 EOF
-chmod +x entrypoint.sh
-
 ```
 
 ```bash
