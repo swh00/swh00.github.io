@@ -206,5 +206,8 @@ sudo docker logs -f starrupture-dedicated
 
 # 유의사항
 게임에서 한 번 서버 관리에서 세션 불러오기를 하면, 서버를 껏다 다시 키지 않는 이상 새로운 세션을 만들거나 다른 세션을 선택할 수 없습니다.(제 코드 버그인듯합니당...)
-   
+
+위 방법으로 안된다면, 아래 영상을 보고 참고하시는 것도 좋을 것 같습니다!
+![How-to StarRupture Dedicated Server on Ubuntu Linux](https://www.youtube.com/watch?v=mmHwD8R-GeI)
+
 즐거운 스타럽쳐 되세요!
