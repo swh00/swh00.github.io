@@ -163,11 +163,13 @@ services:
         max-size: "10m"
         max-file: "3"
 EOF
+chmod +x entrypoint.sh
 
 ```
 
 ```bash
-sudo docker compose up --build -d
+sudo docker compose build --no-cache
+sudo docker compose up -d
 sudo docker logs -f starrupture-dedicated
 ```
 
