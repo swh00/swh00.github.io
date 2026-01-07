@@ -163,6 +163,8 @@ sudo docker logs -f starrupture-dedicated
 ---
 
 ## 3. 게임 접속 및 세션 관리
+![SSH-로그 결과](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20195842.jpg)
+중간에 위와 같이 나오면 Tab 누르고 Enter 누르시면 됩니다.
 ![SSH-로그 결과](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20210409.jpg)
 대략 10분 뒤, 위 사진처럼 로그가 더 이상 나오지 않고 서버 실행 메시지가 뜨면 성공입니다! (확인 후 `Ctrl + C`로 빠져나오기)
 
