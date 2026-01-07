@@ -82,7 +82,6 @@ cd ~/starrupture-server
 ```
 
 ```bash
-cat << 'EOF' > Dockerfile
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -96,22 +95,31 @@ RUN dpkg --add-architecture i386 && apt-get update && \
     dbus-x11 lib32gcc-s1 lib32stdc++6 && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# --- create steam user ---
 RUN useradd -m steam
-USER steam
-WORKDIR /home/steam
 
+# --- install SteamCMD as root ---
 RUN mkdir -p ${STEAMCMD_DIR} && \
     cd ${STEAMCMD_DIR} && \
-    curl -sqL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar zx && \
-    chmod +x steamcmd.sh linux32/steamcmd linux32/steamerrorreporter
+    curl -sSL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar zx && \
+    chmod +x steamcmd.sh linux32/steamcmd linux32/steamerrorreporter && \
+    chown -R steam:steam ${STEAMCMD_DIR}
 
+# --- first steamcmd init (required) ---
 RUN ${STEAMCMD_DIR}/steamcmd.sh \
     +@sSteamCmdForcePlatformType windows \
     +force_install_dir ${SERVER_DIR} \
     +login anonymous \
     +quit
+
+# --- switch to steam ---
+USER steam
+WORKDIR /home/steam
+
+# --- VC runtime ---
 RUN xvfb-run winetricks -q vcrun2015
 
+# --- entrypoint ---
 USER root
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh && chown steam:steam /entrypoint.sh
@@ -119,7 +127,6 @@ RUN chmod +x /entrypoint.sh && chown steam:steam /entrypoint.sh
 USER steam
 WORKDIR ${SERVER_DIR}
 ENTRYPOINT ["/entrypoint.sh"]
-EOF
 
 cat << 'EOF' > entrypoint.sh
 #!/bin/bash
