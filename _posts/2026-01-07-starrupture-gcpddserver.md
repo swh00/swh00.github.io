@@ -82,6 +82,7 @@ cd ~/starrupture-server
 ```
 
 ```bash
+cat << 'EOF' > Docker
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -127,6 +128,8 @@ RUN chmod +x /entrypoint.sh && chown steam:steam /entrypoint.sh
 USER steam
 WORKDIR ${SERVER_DIR}
 ENTRYPOINT ["/entrypoint.sh"]
+
+EOF
 
 cat << 'EOF' > entrypoint.sh
 #!/bin/bash
