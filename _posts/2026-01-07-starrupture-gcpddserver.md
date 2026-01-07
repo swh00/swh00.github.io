@@ -65,27 +65,21 @@ Authorize를 누르면 아래와 같이 서버 컴퓨터에 접속됩니다.
 ![VM 인스턴스-SSH 접속화면](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20195856.jpg)
 
 ![VM 인스턴스-SSH 명령어입력](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20195910.jpg)
-중요한 부분입니다! 아래의 **전체 코드를 통째로 복사해서 마우스 우클릭으로 붙여넣으세요.**
+중요한 부분입니다! 아래의 **코드들을 차례대 복사해서 붙여넣으세요.(Ctrl + V 안되면 마우스 우클릭)**
 
 ```bash
-# 환경 변수 설정
-export DEBIAN_FRONTEND=noninteractive
-
-# 1. 시스템 업데이트 및 도커 설치
 sudo apt update && sudo apt upgrade -y
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 sudo usermod -aG docker $USER
 
-# 2. 디렉토리 생성 및 권한 설정
-sudo rm -rf ~/starrupture-server
 mkdir -p ~/starrupture-server/data/server
 mkdir -p ~/starrupture-server/data/steamcmd
-sudo chown -R 1000:1000 ~/starrupture-server
-sudo chmod -R 777 ~/starrupture-server
+sudo chown -R 1000:1000 ~/starrupture-server/data
 cd ~/starrupture-server
+```
 
-# 3. Dockerfile 작성
+```bash
 cat << 'EOF' > Dockerfile
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
@@ -100,40 +94,27 @@ RUN xvfb-run winetricks -q vcrun2015
 USER root
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh && chown steam:steam /entrypoint.sh
-USER steam
-ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 EOF
 
-# 4. entrypoint.sh 작성
 cat << 'EOF' > entrypoint.sh
 #!/bin/bash
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/steam/steamcmd
 if [ ! -f "/home/steam/steamcmd/steamcmd.sh" ]; then
     mkdir -p /home/steam/steamcmd
-    cd /home/steam/steamcmd
-    curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
+    curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - -C /home/steam/steamcmd
 fi
-cd /home/steam/steamcmd
-chmod +x steamcmd.sh linux32/steamcmd linux32/steamerrorreporter
-./steamcmd.sh +@sSteamCmdForcePlatformType windows \
-              +login anonymous \
-              +force_install_dir /home/steam/starrupture-server \
-              +app_update 3809400 validate \
-              +quit
+
+/home/steam/steamcmd/steamcmd.sh +@sSteamCmdForcePlatformType windows +force_install_dir /home/steam/starrupture-server +login anonymous +app_update 3809400 +quit
+
 rm -f /tmp/.X99-lock
 Xvfb :99 -screen 0 1024x768x16 &
 export DISPLAY=:99
-sleep 5
-if [ -d "/home/steam/starrupture-server/StarRupture/Binaries/Win64" ]; then
-    cd "/home/steam/starrupture-server/StarRupture/Binaries/Win64"
-    exec wine StarRuptureServerEOS-Win64-Shipping.exe -Log -port=7777 -multihome=0.0.0.0 -unattended -NoNativeSnd
-else
-    echo "Fatal Error: Game files not found."
-    exit 1
-fi
+sleep 2
+
+cd "/home/steam/starrupture-server/StarRupture/Binaries/Win64"
+exec wine StarRuptureServerEOS-Win64-Shipping.exe -Log -port=7777 -multihome=0.0.0.0 -unattended -NoNativeSnd
 EOF
 
-# 5. docker-compose.yml 작성
 cat << 'EOF' > docker-compose.yml
 services:
   starrupture:
@@ -154,8 +135,9 @@ services:
         max-size: "10m"
         max-file: "3"
 EOF
+```
 
-# 6. 서버 빌드 및 실행
+```bash
 sudo docker compose up --build -d
 sudo docker logs -f starrupture-dedicated
 ```
