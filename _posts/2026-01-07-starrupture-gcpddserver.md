@@ -36,7 +36,7 @@ OS는 Ubuntu 22.04 LTS, 꼭 x86을 선택해주세요. 부팅 디스크는 SSD, 
 2. **지역**: **서울 (asia-northeast3)**
 3. **머신 유형**: **e2-highmem-4** (추천) 또는 **e2-standard-4**
 4. **OS 및 스토리지**: 
-   - 운영체제: **Ubuntu 22.04 LTS (x86/64)**
+   - 운영체제: **Ubuntu 22.04 LTS (x86/64)** (linux계열 가능. 일부 코드 변형 필요)
    - 디스크: **60GB SSD 영구 디스크**
 5. **네트워크 인터페이스**: 외부 IPv4 주소를 **고정(프리미엄)**으로 설정
 
@@ -89,14 +89,15 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN dpkg --add-architecture i386 && apt-get update && \
     apt-get install -y --no-install-recommends \
-    ca-certificates curl xvfb wine wine32 wine64 winbind winetricks dbus-x11 \
-    lib32gcc-s1 lib32stdc++6 \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    ca-certificates curl xvfb \
+    wine wine32 wine64 winbind winetricks \
+    dbus-x11 lib32gcc-s1 lib32stdc++6 && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m steam
 WORKDIR /home/steam
-USER steam
 
+USER steam
 RUN xvfb-run winetricks -q vcrun2015
 
 USER root
@@ -109,37 +110,37 @@ EOF
 
 cat << 'EOF' > entrypoint.sh
 #!/bin/bash
+set -e
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/steam/steamcmd
 
+# --- SteamCMD only (no X / no Wine) ---
 if [ ! -f "/home/steam/steamcmd/steamcmd.sh" ]; then
     mkdir -p /home/steam/steamcmd
     cd /home/steam/steamcmd
-    curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
+    curl -sqL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar zx
 fi
 
 cd /home/steam/steamcmd
 chmod +x steamcmd.sh linux32/steamcmd linux32/steamerrorreporter
 
 ./steamcmd.sh \
-    +@sSteamCmdForcePlatformType windows \
-    +force_install_dir /home/steam/starrupture-server \
-    +login anonymous \
-    +app_update 3809400 validate \
-    +quit
+  +@sSteamCmdForcePlatformType windows \
+  +login anonymous \
+  +force_install_dir /home/steam/starrupture-server \
+  +app_update 3809400 validate \
+  +quit
 
+# --- Xvfb after SteamCMD ---
 rm -f /tmp/.X99-lock
 Xvfb :99 -screen 0 1024x768x16 &
 export DISPLAY=:99
-sleep 5
+sleep 3
 
-if [ -d "/home/steam/starrupture-server/StarRupture/Binaries/Win64" ]; then
-    cd "/home/steam/starrupture-server/StarRupture/Binaries/Win64"
-    exec wine StarRuptureServerEOS-Win64-Shipping.exe \
-        -Log -port=7777 -multihome=0.0.0.0 -unattended -NoNativeSnd
-else
-    exit 1
-fi
+# --- Run server ---
+cd /home/steam/starrupture-server/StarRupture/Binaries/Win64
+exec wine StarRuptureServerEOS-Win64-Shipping.exe \
+  -Log -port=7777 -multihome=0.0.0.0 -unattended -NoNativeSnd
 EOF
 
 cat << 'EOF' > docker-compose.yml
@@ -157,11 +158,12 @@ services:
     environment:
       - WINEDEBUG=-all
     logging:
-      driver: "json-file"
+      driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
 EOF
+
 ```
 
 ```bash
