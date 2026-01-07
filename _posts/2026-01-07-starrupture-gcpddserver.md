@@ -15,20 +15,20 @@ tags: [StarRupture, GCP, Docker, DedicatedServer, 스타럽]
 ---
 
 ## 1. GCP VM 인스턴스 생성 및 네트워크 설정
-![초기 화면](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20161133.jpg)
+![초기 화면](/assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20161133.jpg)
 위 화면에서 VM 만들기 클릭
 
 ### 인스턴스 사양
-![인스턴스 만들기-머신구성1](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20161519.jpg)
+![인스턴스 만들기-머신구성1](/assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20161519.jpg)
 이름은 자유, 지역은 서울(자기 사는 곳에서 가까운 곳이 비교적 좋습니다).
 
-![인스턴스 만들기-머신구성2](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20161602.jpg)
+![인스턴스 만들기-머신구성2](/assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20161602.jpg)
 밑에 컴퓨터 설정이 있는데, 16gb 권장이라 e2-standard-4, 공장을 많이 지을 거다 하시면 e2-highmem-4를 추천드립니다. (저는 e2-highmem-4를 사용합니다)
 
-![인스턴스 만들기-OS 및 스토리지](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20161704.jpg)
+![인스턴스 만들기-OS 및 스토리지](/assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20161704.jpg)
 OS는 Ubuntu 22.04 LTS, 꼭 x86을 선택해주세요. 부팅 디스크는 SSD, 60GB로 해야 빠르고 안정적으로 할 수 있습니다.
 
-![인스턴스 만들기-네트워킹](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20203059.jpg)
+![인스턴스 만들기-네트워킹](/assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20203059.jpg)
 마지막으로 네트워킹에서 밑으로 내리면 외부 IPv4에서 고정 외부 IP 주소 예약을 선택하고, 아무 이름 입력 후 예약을 누릅니다. 화면 맨 아래 만들기를 누르면 끝! 
 
 정리하자면 다음과 같습니다.
@@ -42,8 +42,8 @@ OS는 Ubuntu 22.04 LTS, 꼭 x86을 선택해주세요. 부팅 디스크는 SSD, 
 
 그러면 VM이 생성되는데요, 생성될 동안 저희는 방화벽 설정을 해야 합니다.
 
-![VPN 네트워크-방화벽 규칙1](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20161903.jpg)
-![VPN 네트워크-방화벽 규칙2](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20162021.jpg)
+![VPN 네트워크-방화벽 규칙1](/assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20161903.jpg)
+![VPN 네트워크-방화벽 규칙2](/assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20162021.jpg)
 왼쪽 상단 툴바를 눌러서 VPC 네트워크 -> 방화벽 -> 방화벽 규칙 만들기 클릭하면 위와 같은 창이 뜹니다. 사진과 같이 설정해주세요.
 
 ### 방화벽 설정 요약
@@ -56,17 +56,18 @@ OS는 Ubuntu 22.04 LTS, 꼭 x86을 선택해주세요. 부팅 디스크는 SSD, 
 ## 2. 서버 구축 자동화 코드 실행 (원샷 스크립트)
 이제 거의 다 왔습니다!
 
-![VM 인스턴스 리스트](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20162100.jpg)
+![VM 인스턴스 리스트](/assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20162100.jpg)
 다시 VM 인스턴스 창에 돌아가시면 생성된 VM을 볼 수 있습니다. **외부 IP**를 기억해주세요. 맨 오른쪽의 **SSH**를 클릭합니다.
 
-![VM 인스턴스-SSH 권한](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20162110.jpg)
+![VM 인스턴스-SSH 권한](/assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20162110.jpg)
 Authorize를 누르면 아래와 같이 서버 컴퓨터에 접속됩니다.
 
-![VM 인스턴스-SSH 접속화면](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20195856.jpg)
+![VM 인스턴스-SSH 접속화면](/assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20195856.jpg)
 
-![VM 인스턴스-SSH 명령어입력](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20195910.jpg)
+![VM 인스턴스-SSH 명령어입력](/assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20195910.jpg)
 중요한 부분입니다! 
 아래의 **코드들을 차례대로 복사해서 붙여넣으세요.(Ctrl + V 안되면 마우스 우클릭)**
+(처음 명령어가 동작하지 않으면, 여러번 입력하거나 시간이 조금 지난 후에 입력해주세요!!)
 
 ```bash
 sudo apt update && sudo apt upgrade -y
@@ -197,12 +198,12 @@ sudo docker logs -f starrupture-dedicated
 ---
 
 ## 3. 게임 접속 및 세션 관리
-![SSH-로그 결과](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20195842.jpg)
+![SSH-로그 결과](/assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20195842.jpg)
 중간에 위와 같이 나오면 Tab 누르고 Enter 누르시면 됩니다.
-![SSH-로그 결과](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20210409.jpg)
+![SSH-로그 결과](/assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20210409.jpg)
 대략 10분 뒤, 위 사진처럼 로그가 더 이상 나오지 않고 서버 실행 메시지가 뜨면 성공입니다! (확인 후 `Ctrl + C`로 빠져나오기)
 
-![서버 실행 성공 화면](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20211001.jpg)
+![서버 실행 성공 화면](/assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20211001.jpg)
 
 * **서버 등록**: 게임 실행 -> 서버 관리 -> VM의 **외부 IP** 입력 후 비밀번호를 설정합니다.
 * **세션 생성**: 새로운 세션을 생성하고 잠시 기다리면 게임이 시작됩니다.
