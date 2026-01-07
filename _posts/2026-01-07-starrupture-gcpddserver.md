@@ -65,25 +65,23 @@ Authorize를 누르면 아래와 같이 서버 컴퓨터에 접속됩니다.
 ![VM 인스턴스-SSH 접속화면](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20195856.jpg)
 
 ![VM 인스턴스-SSH 명령어입력](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20195910.jpg)
-중요한 부분입니다! 아래의 **코드를 한 번에 복사해서 붙여넣으세요.(Ctrl + V 안되면 마우스 우클릭)**
+중요한 부분입니다! 아래의 **코드들을 차례대로 복사해서 붙여넣으세요.(Ctrl + V 안되면 마우스 우클릭)**
 
 ```bash
 sudo apt update && sudo apt upgrade -y
-
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 sudo usermod -aG docker $USER
 
 sudo rm -rf ~/starrupture-server
-
 mkdir -p ~/starrupture-server/data/server
 mkdir -p ~/starrupture-server/data/steamcmd
-
 sudo chown -R 1000:1000 ~/starrupture-server
 sudo chmod -R 777 ~/starrupture-server
-
 cd ~/starrupture-server
+```
 
+```bash
 cat << 'EOF' > Dockerfile
 FROM ubuntu:22.04
 
@@ -164,10 +162,11 @@ services:
         max-size: "10m"
         max-file: "3"
 EOF
+```
 
+```bash
 sudo docker compose up --build -d
 sudo docker logs -f starrupture-dedicated
-
 ```
 
 ---
