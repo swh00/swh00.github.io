@@ -73,9 +73,11 @@ curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 sudo usermod -aG docker $USER
 
+sudo rm -rf ~/starrupture-server
 mkdir -p ~/starrupture-server/data/server
 mkdir -p ~/starrupture-server/data/steamcmd
-sudo chown -R 1000:1000 ~/starrupture-server/data
+sudo chown -R 1000:1000 ~/starrupture-server
+sudo chmod -R 777 ~/starrupture-server
 cd ~/starrupture-server
 ```
 
@@ -94,27 +96,39 @@ RUN xvfb-run winetricks -q vcrun2015
 USER root
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh && chown steam:steam /entrypoint.sh
+USER steam
 ENTRYPOINT ["/entrypoint.sh"]
 EOF
 
+# 4. entrypoint.sh 생성
 cat << 'EOF' > entrypoint.sh
 #!/bin/bash
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/steam/steamcmd
 if [ ! -f "/home/steam/steamcmd/steamcmd.sh" ]; then
     mkdir -p /home/steam/steamcmd
-    curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - -C /home/steam/steamcmd
+    cd /home/steam/steamcmd
+    curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
 fi
-
-/home/steam/steamcmd/steamcmd.sh +@sSteamCmdForcePlatformType windows +force_install_dir /home/steam/starrupture-server +login anonymous +app_update 3809400 +quit
-
+cd /home/steam/steamcmd
+chmod +x steamcmd.sh linux32/steamcmd linux32/steamerrorreporter
+./steamcmd.sh +@sSteamCmdForcePlatformType windows \
+              +force_install_dir /home/steam/starrupture-server \
+              +login anonymous \
+              +app_update 3809400 validate \
+              +quit
 rm -f /tmp/.X99-lock
 Xvfb :99 -screen 0 1024x768x16 &
 export DISPLAY=:99
-sleep 2
-
-cd "/home/steam/starrupture-server/StarRupture/Binaries/Win64"
-exec wine StarRuptureServerEOS-Win64-Shipping.exe -Log -port=7777 -multihome=0.0.0.0 -unattended -NoNativeSnd
+sleep 5
+if [ -d "/home/steam/starrupture-server/StarRupture/Binaries/Win64" ]; then
+    cd "/home/steam/starrupture-server/StarRupture/Binaries/Win64"
+    exec wine StarRuptureServerEOS-Win64-Shipping.exe -Log -port=7777 -multihome=0.0.0.0 -unattended -NoNativeSnd
+else
+    exit 1
+fi
 EOF
 
+# 5. docker-compose.yml 생성
 cat << 'EOF' > docker-compose.yml
 services:
   starrupture:
