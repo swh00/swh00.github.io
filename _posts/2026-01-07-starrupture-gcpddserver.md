@@ -65,70 +65,85 @@ Authorize를 누르면 아래와 같이 서버 컴퓨터에 접속됩니다.
 ![VM 인스턴스-SSH 접속화면](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20195856.jpg)
 
 ![VM 인스턴스-SSH 명령어입력](assets/img/2026post/2026-01-07-starrupture-gcpddserver/화면%20캡처%202026-01-07%20195910.jpg)
-중요한 부분입니다! 아래의 **코드들을 차례대 복사해서 붙여넣으세요.(Ctrl + V 안되면 마우스 우클릭)**
+중요한 부분입니다! 아래의 **코드를 한 번에 복사해서 붙여넣으세요.(Ctrl + V 안되면 마우스 우클릭)**
 
 ```bash
 sudo apt update && sudo apt upgrade -y
+
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 sudo usermod -aG docker $USER
 
 sudo rm -rf ~/starrupture-server
+
 mkdir -p ~/starrupture-server/data/server
 mkdir -p ~/starrupture-server/data/steamcmd
+
 sudo chown -R 1000:1000 ~/starrupture-server
 sudo chmod -R 777 ~/starrupture-server
-cd ~/starrupture-server
-```
 
-```bash
+cd ~/starrupture-server
+
 cat << 'EOF' > Dockerfile
 FROM ubuntu:22.04
+
 ENV DEBIAN_FRONTEND=noninteractive
+
 RUN dpkg --add-architecture i386 && apt-get update && \
     apt-get install -y --no-install-recommends \
-    ca-certificates curl xvfb wine wine32 wine64 winbind winetricks dbus-x11 lib32gcc-s1 lib32stdc++6 \
+    ca-certificates curl xvfb wine wine32 wine64 winbind winetricks dbus-x11 \
+    lib32gcc-s1 lib32stdc++6 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 RUN useradd -m steam
 WORKDIR /home/steam
 USER steam
+
 RUN xvfb-run winetricks -q vcrun2015
+
 USER root
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh && chown steam:steam /entrypoint.sh
+
 USER steam
 ENTRYPOINT ["/entrypoint.sh"]
 EOF
 
-# 4. entrypoint.sh 생성
 cat << 'EOF' > entrypoint.sh
 #!/bin/bash
+
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/steam/steamcmd
+
 if [ ! -f "/home/steam/steamcmd/steamcmd.sh" ]; then
     mkdir -p /home/steam/steamcmd
     cd /home/steam/steamcmd
     curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
 fi
+
 cd /home/steam/steamcmd
 chmod +x steamcmd.sh linux32/steamcmd linux32/steamerrorreporter
-./steamcmd.sh +@sSteamCmdForcePlatformType windows \
-              +force_install_dir /home/steam/starrupture-server \
-              +login anonymous \
-              +app_update 3809400 validate \
-              +quit
+
+./steamcmd.sh \
+    +@sSteamCmdForcePlatformType windows \
+    +force_install_dir /home/steam/starrupture-server \
+    +login anonymous \
+    +app_update 3809400 validate \
+    +quit
+
 rm -f /tmp/.X99-lock
 Xvfb :99 -screen 0 1024x768x16 &
 export DISPLAY=:99
 sleep 5
+
 if [ -d "/home/steam/starrupture-server/StarRupture/Binaries/Win64" ]; then
     cd "/home/steam/starrupture-server/StarRupture/Binaries/Win64"
-    exec wine StarRuptureServerEOS-Win64-Shipping.exe -Log -port=7777 -multihome=0.0.0.0 -unattended -NoNativeSnd
+    exec wine StarRuptureServerEOS-Win64-Shipping.exe \
+        -Log -port=7777 -multihome=0.0.0.0 -unattended -NoNativeSnd
 else
     exit 1
 fi
 EOF
 
-# 5. docker-compose.yml 생성
 cat << 'EOF' > docker-compose.yml
 services:
   starrupture:
@@ -149,11 +164,10 @@ services:
         max-size: "10m"
         max-file: "3"
 EOF
-```
 
-```bash
 sudo docker compose up --build -d
 sudo docker logs -f starrupture-dedicated
+
 ```
 
 ---
