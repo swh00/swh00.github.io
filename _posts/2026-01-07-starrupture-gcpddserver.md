@@ -75,11 +75,11 @@ sudo apt update && sudo apt upgrade -y
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 
-# docker compose 플러그인
 sudo apt install -y docker-compose-plugin
 
 sudo rm -rf ~/starrupture-server
-mkdir -p ~/starrupture-server
+sudo mkdir -p ~/starrupture-server
+sudo chown -R $USER:$USER ~/starrupture-server
 cd ~/starrupture-server
 ```
 
@@ -90,39 +90,32 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV STEAMCMD_DIR=/opt/steamcmd
 ENV SERVER_DIR=/opt/starrupture
+ENV DISPLAY=:99
 
-RUN dpkg --add-architecture i386 && apt-get update && \
+RUN dpkg --add-architecture i386 && \
+    apt-get update && \
     apt-get install -y --no-install-recommends \
-    ca-certificates curl xvfb \
-    wine wine32 wine64 winbind winetricks \
-    dbus-x11 lib32gcc-s1 lib32stdc++6 && \
+      ca-certificates curl xvfb \
+      wine wine32 wine64 winbind winetricks \
+      lib32gcc-s1 lib32stdc++6 && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# --- create steam user ---
-RUN useradd -m steam
+# steam user
+RUN useradd -m -s /bin/bash steam
 
-# --- install SteamCMD as root ---
+# SteamCMD (curl 방식 – Docker 정석)
 RUN mkdir -p ${STEAMCMD_DIR} && \
     cd ${STEAMCMD_DIR} && \
     curl -sSL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar zx && \
     chmod +x steamcmd.sh linux32/steamcmd linux32/steamerrorreporter && \
     chown -R steam:steam ${STEAMCMD_DIR}
 
-# --- first steamcmd init (required) ---
-RUN ${STEAMCMD_DIR}/steamcmd.sh \
-    +@sSteamCmdForcePlatformType windows \
-    +force_install_dir ${SERVER_DIR} \
-    +login anonymous \
-    +quit
-
-# --- switch to steam ---
 USER steam
 WORKDIR /home/steam
 
-# --- VC runtime ---
+# VC runtime
 RUN xvfb-run winetricks -q vcrun2015
 
-# --- entrypoint ---
 USER root
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh && chown steam:steam /entrypoint.sh
@@ -130,8 +123,8 @@ RUN chmod +x /entrypoint.sh && chown steam:steam /entrypoint.sh
 USER steam
 WORKDIR ${SERVER_DIR}
 ENTRYPOINT ["/entrypoint.sh"]
-
 EOF
+
 
 cat << 'EOF' > entrypoint.sh
 #!/bin/bash
@@ -142,7 +135,13 @@ export STEAMCMD_DIR=/opt/steamcmd
 export SERVER_DIR=/opt/starrupture
 export DISPLAY=:99
 
-# --- install once ---
+# --- SteamCMD 최초 초기화 (무조건 필요) ---
+if [ ! -d "$HOME/.steam/steamcmd" ]; then
+    echo "[INIT] SteamCMD first-time init..."
+    ${STEAMCMD_DIR}/steamcmd.sh +login anonymous +quit
+fi
+
+# --- 서버 최초 설치 ---
 if [ ! -d "$SERVER_DIR/StarRupture" ]; then
     echo "[INIT] Installing StarRupture server..."
     ${STEAMCMD_DIR}/steamcmd.sh \
@@ -168,14 +167,15 @@ exec wine StarRuptureServerEOS-Win64-Shipping.exe \
   -NoNativeSnd
 EOF
 
-chmod +x entrypoint.sh
-
 cat << 'EOF' > docker-compose.yml
 services:
   starrupture:
     build: .
     container_name: starrupture-dedicated
     restart: always
+    volumes:
+      - ./data/steam:/home/steam
+      - ./data/server:/opt/starrupture
     ports:
       - "7777:7777/udp"
       - "7777:7777/tcp"
