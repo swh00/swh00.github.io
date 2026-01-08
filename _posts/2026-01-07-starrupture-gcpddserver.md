@@ -251,6 +251,6 @@ sudo docker logs -f starrupture-dedicated
 3. 처음 VM 인스턴스를 생성하고 서버에 접속할 때, 바로 명령어를 입력하면 동작하지 않는 경우가 있습니다. 생성 후, 어느정도 시간이 지난후에 입력하거나, 계속 입력하다보면 정상적으로 동작합니다.
 
 위 방법으로 안된다면, 아래 영상을 보고 참고하시는 것도 좋을 것 같습니다!
-![How-to StarRupture Dedicated Server on Ubuntu Linux](https://www.youtube.com/watch?v=mmHwD8R-GeI)
+[How-to StarRupture Dedicated Server on Ubuntu Linux](https://www.youtube.com/watch?v=mmHwD8R-GeI)
 
 즐거운 스타럽쳐 되세요!
