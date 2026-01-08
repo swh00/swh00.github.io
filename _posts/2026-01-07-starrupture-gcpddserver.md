@@ -217,21 +217,27 @@ SSH 터미널에서 서버를 시작하거나 종료할 때 사용하는 명령�
 <details>
 <summary>명령어 모음 보기 (클릭)</summary>
 
-### 1. 업데이트 후 재시작
+### 1. 단순 시작
 
 ```bash
-cd ~/starrupture-server
-sudo docker compose up --build -d
+sudo docker compose up -d
 ```
 
-### 2. 서버 중지
+### 2. 업데이트 후 재시작
+
+```bash
+sudo docker compose build --no-cache
+sudo docker compose up -d
+```
+
+### 3. 서버 중지
 
 ```bash
 cd ~/starrupture-server
 sudo docker compose down
 ```
 
-### 3. 실시간 로그 확인 (`Ctrl + C`로 종료)
+### 4. 실시간 로그 확인 (`Ctrl + C`로 종료)
 
 ```bash
 sudo docker logs -f starrupture-dedicated
