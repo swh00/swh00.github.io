@@ -81,6 +81,9 @@ sudo rm -rf ~/starrupture-server
 sudo mkdir -p ~/starrupture-server
 sudo chown -R $USER:$USER ~/starrupture-server
 cd ~/starrupture-server
+sudo mkdir -p data/steam data/server
+sudo chown -R 1000:1000 data
+sudo chmod -R 755 data
 ```
 
 ```bash
